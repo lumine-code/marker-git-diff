@@ -1,6 +1,8 @@
 # scrollmap-git-diff
 
-Show git diff markers on the scrollbar. A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders added, modified and removed line hunks against the repository `HEAD`.
+Show git diff markers on the scrollbar.
+
+A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders added, modified and removed line hunks against the repository `HEAD`.
 
 ## Features
 

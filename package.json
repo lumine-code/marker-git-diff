@@ -1,7 +1,7 @@
 {
   "name": "scrollmap-git-diff",
   "author": "lumine-code",
-  "description": "Show git diff markers on the scrollbar",
+  "description": "Show git diff markers on the scrollbar.",
   "repository": "https://github.com/lumine-code/scrollmap-git-diff",
   "bugs": {
     "url": "https://github.com/lumine-code/scrollmap-git-diff/issues"
