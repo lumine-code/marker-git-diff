@@ -7,10 +7,12 @@
     "url": "https://github.com/lumine-code/scrollmap-git-diff/issues"
   },
   "keywords": [
-    "scrollmap",
-    "git",
-    "diff",
-    "marker"
+    "overview-ruler",
+    "gutter",
+    "annotation",
+    "decoration",
+    "changes",
+    "vcs"
   ],
   "version": "1.0.0",
   "license": "MIT",
