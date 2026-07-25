@@ -1,0 +1,3 @@
+# The spec fixture is a byte-exact git repository snapshot; any EOL
+# conversion would desynchronize the working files from their HEAD blobs.
+spec/fixtures/** -text
