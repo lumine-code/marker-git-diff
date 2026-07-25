@@ -81,19 +81,17 @@ describe("scrollmap-git-diff", () => {
   });
 
   describe("activation", () => {
-    it("activates and observes the threshold setting", () => {
+    it("activates", () => {
       expect(atom.packages.isPackageActive("scrollmap-git-diff")).toBe(true);
-      expect(mainModule.threshold).toBe(0);
-
-      atom.config.set("scrollmap-git-diff.threshold", 4);
-      expect(mainModule.threshold).toBe(4);
     });
   });
 
   describe("scrollmap service provider", () => {
-    it("describes the git layer", () => {
-      expect(provider.name).toBe("git");
+    it("describes the git-diff layer", () => {
+      expect(provider.name).toBe("git-diff");
       expect(provider.position).toBe("right");
+      expect(provider.merge).toBe(true);
+      expect(provider.threshold).toBe("scrollmap-git-diff.threshold");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
@@ -165,7 +163,7 @@ describe("scrollmap-git-diff", () => {
       expect(provider.getItems(layer)).toEqual([{ row: 0, end: 0, cls: "removed" }]);
     });
 
-    it("merges adjacent hunks of the same state", () => {
+    it("returns raw hunk ranges and leaves merging to the hub", () => {
       const layer = createLayer(editor);
       layer.cache.set("diffs", [
         { newStart: 4, oldLines: 0, newLines: 2 },
@@ -174,28 +172,10 @@ describe("scrollmap-git-diff", () => {
       ]);
 
       expect(provider.getItems(layer)).toEqual([
-        { row: 0, end: 4, cls: "added" },
+        { row: 3, end: 4, cls: "added" },
+        { row: 0, end: 2, cls: "added" },
         { row: 9, end: 9, cls: "modified" },
       ]);
-    });
-
-    it("hides all markers when the threshold is exceeded", () => {
-      atom.config.set("scrollmap-git-diff.threshold", 1);
-      const layer = createLayer(editor);
-      layer.cache.set("diffs", [
-        { newStart: 1, oldLines: 1, newLines: 1 },
-        { newStart: 10, oldLines: 0, newLines: 1 },
-      ]);
-
-      expect(provider.getItems(layer)).toEqual([]);
-    });
-
-    it("re-runs the layer when the threshold changes", async () => {
-      const layer = await createInitializedLayer(editor);
-      layer.update.calls.reset();
-
-      atom.config.set("scrollmap-git-diff.threshold", 9);
-      expect(layer.update).toHaveBeenCalled();
     });
   });
 });
