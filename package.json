@@ -1,19 +1,29 @@
 {
   "name": "scrollmap-git-diff",
+  "author": "lumine-code",
   "description": "Show git diff markers on the scrollbar",
-  "repository": "https://github.com/asiloisad/pulsar-scrollmap-git-diff",
+  "repository": "https://github.com/lumine-code/scrollmap-git-diff",
+  "bugs": {
+    "url": "https://github.com/lumine-code/scrollmap-git-diff/issues"
+  },
   "keywords": [
     "scrollmap",
     "git",
     "diff",
     "marker"
   ],
-  "version": "0.3.1",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
     "atom": ">=1.100.0 <2.0.0"
   },
   "main": "./lib/main",
+  "scripts": {
+    "test": "cd ../lumine && npm run test:only -- ../scrollmap-git-diff/spec",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "providedServices": {
     "scrollmap": {
       "versions": {
@@ -21,12 +31,19 @@
       }
     }
   },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.2.2",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.6"
+  },
   "configSchema": {
     "threshold": {
-      "order": 1,
-      "type": "integer",
       "title": "Threshold",
       "description": "Hide markers if count exceeds this value. Zero means no limit.",
+      "type": "integer",
       "minimum": 0,
       "default": 0
     }

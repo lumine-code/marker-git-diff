@@ -1,0 +1,15 @@
+.scrollmap .marker.marker-git {
+  z-index: 11;
+
+  &.added {
+    background-color: var(--text-color-success);
+  }
+
+  &.modified {
+    background-color: var(--text-color-warning);
+  }
+
+  &.removed {
+    background-color: var(--text-color-error);
+  }
+}
