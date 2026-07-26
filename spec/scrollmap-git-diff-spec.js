@@ -65,7 +65,7 @@ describe("scrollmap-git-diff", () => {
     editor = await atom.workspace.open(path.join(projectPath, "sample.js"));
     const pack = await atom.packages.activatePackage("scrollmap-git-diff");
     mainModule = pack.mainModule;
-    provider = mainModule.provideScrollmap();
+    provider = mainModule.provideScrollmapLayer();
   });
 
   afterEach(() => {

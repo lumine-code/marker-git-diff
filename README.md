@@ -30,7 +30,7 @@ The style can be adjusted in the `styles.less` file, e.g. recolor markers of a g
 
 ## Services
 
-- **scrollmap** (`1.1.0`): provided to register the `git` marker layer rendered on the editor scrollbar.
+- **scrollmap.layer** (`1.0.0`): provided to register the `git` marker layer rendered on the editor scrollbar.
 
 ## Contributing
 

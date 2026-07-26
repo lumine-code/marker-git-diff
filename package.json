@@ -27,9 +27,9 @@
     "format:check": "prettier --check ."
   },
   "providedServices": {
-    "scrollmap": {
+    "scrollmap.layer": {
       "versions": {
-        "1.1.0": "provideScrollmap"
+        "1.0.0": "provideScrollmapLayer"
       }
     }
   },
