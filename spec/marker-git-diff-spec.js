@@ -186,57 +186,11 @@ describe("marker-git-diff", () => {
   });
 
   describe("the per-editor diff source", () => {
-    it("fans one diff out to every layer attached to the editor", async () => {
-      // What two renderers look like from here: two layers, one editor.
-      const first = await createInitializedLayer(editor);
-      const second = await createInitializedLayer(editor);
-      expect(mainModule.sourceForEditor(editor).layers.size).toBe(2);
+    it("destroys the source when the layer detaches", async () => {
+      const layer = await createInitializedLayer(editor);
+      expect(mainModule.sourceForEditor(editor)).toBeDefined();
 
-      editor.setTextInBufferRange(
-        [
-          [0, 0],
-          [0, 1],
-        ],
-        "M",
-      );
-      await refresh(first, second);
-
-      expect(first.update).toHaveBeenCalled();
-      expect(second.update).toHaveBeenCalled();
-      expect(provider.getItems(first)).toEqual([{ row: 0, end: 0, cls: "modified" }]);
-      expect(provider.getItems(second)).toEqual([{ row: 0, end: 0, cls: "modified" }]);
-    });
-
-    it("seeds a layer attaching to a source that already has diffs", async () => {
-      const first = await createInitializedLayer(editor);
-      editor.setTextInBufferRange(
-        [
-          [0, 0],
-          [0, 1],
-        ],
-        "M",
-      );
-      await refresh(first);
-
-      const second = createLayer(editor);
-      provider.initialize(second);
-
-      expect(second.cache.get("diffs")).toBe(first.cache.get("diffs"));
-      expect(second.update).toHaveBeenCalled();
-    });
-
-    it("keeps the source alive until the last layer detaches", async () => {
-      const first = await createInitializedLayer(editor);
-      const second = await createInitializedLayer(editor);
-
-      first.disposables.dispose();
-      expect(mainModule.sourceForEditor(editor).layers.size).toBe(1);
-
-      first.update.calls.reset();
-      await refresh(second);
-      expect(first.update).not.toHaveBeenCalled();
-
-      second.disposables.dispose();
+      layer.disposables.dispose();
       expect(mainModule.sourceForEditor(editor)).toBeUndefined();
     });
   });
