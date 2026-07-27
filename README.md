@@ -30,7 +30,7 @@ The style can be adjusted in the `styles.less` file, e.g. recolor markers of a g
 
 ## Services
 
-- **[marker.layer](https://lumine-code.github.io/docs.html#services/marker.layer)** (`1.0.0`): provided to register the `git-diff` marker layer drawn by the editor's overview maps.
+- **marker.layer** (`1.0.0`): provided to register the `git-diff` marker layer drawn by the editor's overview maps.
 
 ## Contributing
 
