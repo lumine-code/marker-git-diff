@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          path: scrollmap-git-diff
+          path: pkg_lumine/marker-git-diff
       - uses: actions/checkout@v6
         with:
           repository: lumine-code/lumine
@@ -73,13 +73,16 @@ jobs:
       - name: Use HTTPS for GitHub git dependencies
         run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
       - name: Install package dependencies
-        working-directory: scrollmap-git-diff
+        working-directory: pkg_lumine/marker-git-diff
         run: npm ci --ignore-scripts
       - name: Install editor dependencies
         working-directory: lumine
         run: |
           install() { npm ci --ignore-scripts; }
           install || install || install
+      - name: Check the service graph
+        working-directory: lumine
+        run: node script/check-services.js --package marker-git-diff
       - name: Download the Electron binary
         working-directory: lumine
         run: node ./node_modules/electron/install.js
@@ -89,4 +92,4 @@ jobs:
       - name: Run the Jasmine spec suite
         working-directory: lumine
         timeout-minutes: 20
-        run: xvfb-run --auto-servernum npm start -- --test ../scrollmap-git-diff/spec
+        run: xvfb-run --auto-servernum npm start -- --test ../pkg_lumine/marker-git-diff/spec

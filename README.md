@@ -1,12 +1,12 @@
-# scrollmap-git-diff
+# marker-git-diff
 
-Show git diff markers on the scrollbar.
+Show git diff markers on the scrollbar and minimap.
 
-A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that renders added, modified and removed line hunks against the repository `HEAD`.
+A marker layer that renders added, modified and removed line hunks against the repository `HEAD`, drawn by [scrollmap](https://github.com/lumine-code/scrollmap) on the scrollbar and by [minimap](https://github.com/lumine-code/minimap) on the minimap.
 
 ## Features
 
-- **Hunk markers**: shows added, modified and removed lines as scrollbar markers.
+- **Hunk markers**: shows added, modified and removed lines as overview markers.
 - **State colors**: markers are colored by hunk state via theme colors.
 - **Live updates**: follows repository status changes and editor edits.
 - **Range merging**: adjacent hunks of the same state are merged into a single marker.
@@ -14,14 +14,14 @@ A layer package for [scrollmap](https://github.com/lumine-code/scrollmap) that r
 
 ## Installation
 
-To install `scrollmap-git-diff` search for _scrollmap-git-diff_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/scrollmap-git-diff`.
+To install `marker-git-diff` search for _marker-git-diff_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/marker-git-diff`.
 
 ## Customization
 
 The style can be adjusted in the `styles.less` file, e.g. recolor markers of a given hunk state:
 
 ```less
-.scrollmap .marker.marker-git-diff {
+.marker.marker-git-diff {
   &.modified {
     background-color: var(--text-color-modified);
   }
@@ -30,7 +30,7 @@ The style can be adjusted in the `styles.less` file, e.g. recolor markers of a g
 
 ## Services
 
-- **[scrollmap.layer](https://lumine-code.github.io/docs.html#services/scrollmap.layer)** (`1.0.0`): provided to register the `git` marker layer rendered on the editor scrollbar.
+- **[marker.layer](https://lumine-code.github.io/docs.html#services/marker.layer)** (`1.0.0`): provided to register the `git-diff` marker layer drawn by the editor's overview maps.
 
 ## Contributing
 

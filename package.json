@@ -1,16 +1,18 @@
 {
-  "name": "scrollmap-git-diff",
+  "name": "marker-git-diff",
   "author": "lumine-code",
-  "description": "Show git diff markers on the scrollbar.",
-  "repository": "https://github.com/lumine-code/scrollmap-git-diff",
+  "description": "Show git diff markers on the scrollbar and minimap.",
+  "repository": "https://github.com/lumine-code/marker-git-diff",
   "bugs": {
-    "url": "https://github.com/lumine-code/scrollmap-git-diff/issues"
+    "url": "https://github.com/lumine-code/marker-git-diff/issues"
   },
   "keywords": [
     "overview-ruler",
     "gutter",
     "annotation",
     "decoration",
+    "scrollmap",
+    "minimap",
     "changes",
     "vcs"
   ],
@@ -21,15 +23,15 @@
   },
   "main": "./lib/main",
   "scripts": {
-    "test": "cd ../../lumine && npm run test:only -- ../pkg_lumine/scrollmap-git-diff/spec",
+    "test": "cd ../../lumine && npm run test:only -- ../pkg_lumine/marker-git-diff/spec",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "providedServices": {
-    "scrollmap.layer": {
+    "marker.layer": {
       "versions": {
-        "1.0.0": "provideScrollmapLayer"
+        "1.0.0": "provideMarkerLayer"
       }
     }
   },

@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
-describe("scrollmap-git-diff", () => {
+describe("marker-git-diff", () => {
   let workspaceElement, mainModule, provider, projectPath, editor, layers;
 
   // The spec runner freezes setTimeout, so poll on animation frames instead.
@@ -32,7 +32,9 @@ describe("scrollmap-git-diff", () => {
   function createLayer(layerEditor) {
     const layer = {
       editor: layerEditor,
+      props: provider,
       cache: new Map(),
+      items: [],
       disposables: new CompositeDisposable(),
       update: jasmine.createSpy("update"),
     };
@@ -40,17 +42,21 @@ describe("scrollmap-git-diff", () => {
     return layer;
   }
 
+  // Attached the way a renderer's layer host attaches it, then waited out until
+  // the repository resolved and the first diff landed.
   async function createInitializedLayer(layerEditor) {
     const layer = createLayer(layerEditor);
     provider.initialize(layer);
-    await waitFor(() => layer.update.calls.count() > 0);
+    await waitFor(() => layer.cache.has("diffs"));
     return layer;
   }
 
-  async function refresh(layer) {
-    layer.update.calls.reset();
-    await layer.cache.get("refreshDiffs")();
-    await waitFor(() => layer.update.calls.count() > 0);
+  async function refresh(...targets) {
+    for (const layer of targets) {
+      layer.update.calls.reset();
+    }
+    await mainModule.sourceForEditor(targets[0].editor).refresh();
+    await waitFor(() => targets.every((layer) => layer.update.calls.count() > 0));
   }
 
   beforeEach(async () => {
@@ -58,14 +64,14 @@ describe("scrollmap-git-diff", () => {
     jasmine.attachToDOM(workspaceElement);
     layers = [];
 
-    projectPath = fs.mkdtempSync(path.join(os.tmpdir(), "scrollmap-git-diff-"));
+    projectPath = fs.mkdtempSync(path.join(os.tmpdir(), "marker-git-diff-"));
     fs.cpSync(path.join(__dirname, "fixtures", "working-dir"), projectPath, { recursive: true });
     fs.renameSync(path.join(projectPath, "git.git"), path.join(projectPath, ".git"));
 
     editor = await atom.workspace.open(path.join(projectPath, "sample.js"));
-    const pack = await atom.packages.activatePackage("scrollmap-git-diff");
+    const pack = await atom.packages.activatePackage("marker-git-diff");
     mainModule = pack.mainModule;
-    provider = mainModule.provideScrollmapLayer();
+    provider = mainModule.provideMarkerLayer();
   });
 
   afterEach(() => {
@@ -82,35 +88,35 @@ describe("scrollmap-git-diff", () => {
 
   describe("activation", () => {
     it("activates", () => {
-      expect(atom.packages.isPackageActive("scrollmap-git-diff")).toBe(true);
+      expect(atom.packages.isPackageActive("marker-git-diff")).toBe(true);
     });
   });
 
-  describe("scrollmap service provider", () => {
+  describe("marker.layer service provider", () => {
     it("describes the git-diff layer", () => {
       expect(provider.name).toBe("git-diff");
       expect(provider.position).toBe("right");
       expect(provider.merge).toBe(true);
-      expect(provider.threshold).toBe("scrollmap-git-diff.threshold");
+      expect(provider.threshold).toBe("marker-git-diff.threshold");
       expect(typeof provider.initialize).toBe("function");
       expect(typeof provider.getItems).toBe("function");
     });
 
     it("resolves the repository owning the editor path", async () => {
       const layer = await createInitializedLayer(editor);
-      const repository = layer.cache.get("repository");
+      const { repository } = mainModule.sourceForEditor(layer.editor);
       expect(repository).toBeTruthy();
       // Normalize separators, 8.3 aliases, and drive-letter case on Windows.
       const normalize = (p) => fs.realpathSync.native(p).replace(/\\/g, "/").toLowerCase();
       expect(normalize(repository.getWorkingDirectory())).toBe(normalize(projectPath));
     });
 
-    it("caches no repository for editors outside any repository", async () => {
-      const outsidePath = fs.mkdtempSync(path.join(os.tmpdir(), "scrollmap-git-diff-out-"));
+    it("resolves no repository for editors outside any repository", async () => {
+      const outsidePath = fs.mkdtempSync(path.join(os.tmpdir(), "marker-git-diff-out-"));
       const outsideEditor = await atom.workspace.open(path.join(outsidePath, "plain.txt"));
 
       const layer = await createInitializedLayer(outsideEditor);
-      expect(layer.cache.get("repository")).toBe(null);
+      expect(mainModule.sourceForEditor(outsideEditor).repository).toBe(null);
       expect(provider.getItems(layer)).toEqual([]);
 
       fs.rmSync(outsidePath, { recursive: true, force: true });
@@ -163,7 +169,7 @@ describe("scrollmap-git-diff", () => {
       expect(provider.getItems(layer)).toEqual([{ row: 0, end: 0, cls: "removed" }]);
     });
 
-    it("returns raw hunk ranges and leaves merging to the hub", () => {
+    it("returns raw hunk ranges and leaves merging to the host", () => {
       const layer = createLayer(editor);
       layer.cache.set("diffs", [
         { newStart: 4, oldLines: 0, newLines: 2 },
@@ -176,6 +182,62 @@ describe("scrollmap-git-diff", () => {
         { row: 0, end: 2, cls: "added" },
         { row: 9, end: 9, cls: "modified" },
       ]);
+    });
+  });
+
+  describe("the per-editor diff source", () => {
+    it("fans one diff out to every layer attached to the editor", async () => {
+      // What two renderers look like from here: two layers, one editor.
+      const first = await createInitializedLayer(editor);
+      const second = await createInitializedLayer(editor);
+      expect(mainModule.sourceForEditor(editor).layers.size).toBe(2);
+
+      editor.setTextInBufferRange(
+        [
+          [0, 0],
+          [0, 1],
+        ],
+        "M",
+      );
+      await refresh(first, second);
+
+      expect(first.update).toHaveBeenCalled();
+      expect(second.update).toHaveBeenCalled();
+      expect(provider.getItems(first)).toEqual([{ row: 0, end: 0, cls: "modified" }]);
+      expect(provider.getItems(second)).toEqual([{ row: 0, end: 0, cls: "modified" }]);
+    });
+
+    it("seeds a layer attaching to a source that already has diffs", async () => {
+      const first = await createInitializedLayer(editor);
+      editor.setTextInBufferRange(
+        [
+          [0, 0],
+          [0, 1],
+        ],
+        "M",
+      );
+      await refresh(first);
+
+      const second = createLayer(editor);
+      provider.initialize(second);
+
+      expect(second.cache.get("diffs")).toBe(first.cache.get("diffs"));
+      expect(second.update).toHaveBeenCalled();
+    });
+
+    it("keeps the source alive until the last layer detaches", async () => {
+      const first = await createInitializedLayer(editor);
+      const second = await createInitializedLayer(editor);
+
+      first.disposables.dispose();
+      expect(mainModule.sourceForEditor(editor).layers.size).toBe(1);
+
+      first.update.calls.reset();
+      await refresh(second);
+      expect(first.update).not.toHaveBeenCalled();
+
+      second.disposables.dispose();
+      expect(mainModule.sourceForEditor(editor)).toBeUndefined();
     });
   });
 });

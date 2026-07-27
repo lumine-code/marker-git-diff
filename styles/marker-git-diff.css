@@ -1,4 +1,4 @@
-.scrollmap .marker.marker-git-diff {
+.marker.marker-git-diff {
   z-index: 11;
 
   &.added {
