@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          path: pkg_lumine/marker-git-diff
+          path: marker-git-diff
       - uses: actions/checkout@v6
         with:
           repository: lumine-code/lumine
@@ -71,7 +71,7 @@ jobs:
       - name: Use HTTPS for GitHub git dependencies
         run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
       - name: Install package dependencies
-        working-directory: pkg_lumine/marker-git-diff
+        working-directory: marker-git-diff
         run: npm ci --ignore-scripts
       - name: Install editor dependencies
         working-directory: lumine
@@ -87,4 +87,4 @@ jobs:
       - name: Run the Jasmine spec suite
         working-directory: lumine
         timeout-minutes: 20
-        run: xvfb-run --auto-servernum npm start -- --test ../pkg_lumine/marker-git-diff/spec
+        run: xvfb-run --auto-servernum npm start -- --test ../marker-git-diff/spec
