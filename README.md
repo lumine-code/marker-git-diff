@@ -18,9 +18,9 @@ To install `marker-git-diff` search for _marker-git-diff_ in the Install pane of
 
 ## Customization
 
-The style can be adjusted in the `styles.less` file, e.g. recolor markers of a given hunk state:
+The style can be adjusted in the `styles.css` file, e.g. recolor markers of a given hunk state:
 
-```less
+```css
 .marker.marker-git-diff {
   &.modified {
     background-color: var(--text-color-modified);
