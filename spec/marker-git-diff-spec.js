@@ -79,7 +79,9 @@ describe("marker-git-diff", () => {
       layer.disposables.dispose();
     }
     try {
-      fs.rmSync(projectPath, { recursive: true, force: true });
+      // Retries because Windows keeps a directory non-empty until the last handle on a
+      // child closes, and `force` swallows only ENOENT.
+      fs.rmSync(projectPath, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
     } catch {
       // Windows can refuse to delete a repository the git host still holds
       // open; the OS cleans the temp directory eventually.
@@ -119,7 +121,7 @@ describe("marker-git-diff", () => {
       expect(mainModule.sourceForEditor(outsideEditor).repository).toBe(null);
       expect(provider.getItems(layer)).toEqual([]);
 
-      fs.rmSync(outsidePath, { recursive: true, force: true });
+      fs.rmSync(outsidePath, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
     });
 
     it("reports no markers for an unmodified file", async () => {
