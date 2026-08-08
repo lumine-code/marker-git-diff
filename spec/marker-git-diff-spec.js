@@ -171,6 +171,34 @@ describe("marker-git-diff", () => {
       expect(provider.getItems(layer)).toEqual([{ row: 0, end: 0, cls: "removed" }]);
     });
 
+    // Git reports "ignored" as its own state, not as "untracked", so the
+    // untracked early-out never covered it. The path here also carries a glob
+    // metacharacter, which `git show <rev>:<path>` used to answer with HEAD's
+    // commit message rather than reporting the path as absent — between them,
+    // every line of an ignored file was marked.
+    it("reports no markers for an ignored file", async () => {
+      const ignoredPath = path.join(projectPath, "[e] dir", "out.log");
+      fs.writeFileSync(path.join(projectPath, ".gitignore"), "*.log\n");
+      fs.mkdirSync(path.join(projectPath, "[e] dir"));
+      fs.writeFileSync(ignoredPath, "one\ntwo\nthree\n");
+
+      const repository = await atom.repositories.resolveForPath(ignoredPath);
+      await repository.refreshStatusSnapshot();
+      expect(repository.getStatusEntry(ignoredPath).ignored).toBe(true);
+      expect(await repository.getFileAtRevision(ignoredPath, "HEAD")).toBeNull();
+
+      const ignoredEditor = await atom.workspace.open(ignoredPath);
+      const layer = await createInitializedLayer(ignoredEditor);
+      spyOn(repository, "getLineDiffsAsync").andCallThrough();
+      ignoredEditor.setCursorBufferPosition([0, Infinity]);
+      ignoredEditor.insertText("edited");
+      await refresh(layer);
+
+      expect(repository.getLineDiffsAsync).not.toHaveBeenCalled();
+      expect(layer.cache.get("diffs")).toEqual([]);
+      expect(provider.getItems(layer)).toEqual([]);
+    });
+
     it("returns raw hunk ranges and leaves merging to the host", () => {
       const layer = createLayer(editor);
       layer.cache.set("diffs", [
