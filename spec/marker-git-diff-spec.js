@@ -1,4 +1,4 @@
-const { CompositeDisposable } = require("atom");
+const { CompositeDisposable } = require("lumine");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
@@ -60,7 +60,7 @@ describe("marker-git-diff", () => {
   }
 
   beforeEach(async () => {
-    workspaceElement = atom.views.getView(atom.workspace);
+    workspaceElement = lumine.views.getView(lumine.workspace);
     jasmine.attachToDOM(workspaceElement);
     layers = [];
 
@@ -68,8 +68,8 @@ describe("marker-git-diff", () => {
     fs.cpSync(path.join(__dirname, "fixtures", "working-dir"), projectPath, { recursive: true });
     fs.renameSync(path.join(projectPath, "git.git"), path.join(projectPath, ".git"));
 
-    editor = await atom.workspace.open(path.join(projectPath, "sample.js"));
-    const pack = await atom.packages.activatePackage("marker-git-diff");
+    editor = await lumine.workspace.open(path.join(projectPath, "sample.js"));
+    const pack = await lumine.packages.activatePackage("marker-git-diff");
     mainModule = pack.mainModule;
     provider = mainModule.provideMarkerLayer();
   });
@@ -90,7 +90,7 @@ describe("marker-git-diff", () => {
 
   describe("activation", () => {
     it("activates", () => {
-      expect(atom.packages.isPackageActive("marker-git-diff")).toBe(true);
+      expect(lumine.packages.isPackageActive("marker-git-diff")).toBe(true);
     });
   });
 
@@ -115,7 +115,7 @@ describe("marker-git-diff", () => {
 
     it("resolves no repository for editors outside any repository", async () => {
       const outsidePath = fs.mkdtempSync(path.join(os.tmpdir(), "marker-git-diff-out-"));
-      const outsideEditor = await atom.workspace.open(path.join(outsidePath, "plain.txt"));
+      const outsideEditor = await lumine.workspace.open(path.join(outsidePath, "plain.txt"));
 
       const layer = await createInitializedLayer(outsideEditor);
       expect(mainModule.sourceForEditor(outsideEditor).repository).toBe(null);
@@ -182,12 +182,12 @@ describe("marker-git-diff", () => {
       fs.mkdirSync(path.join(projectPath, "[e] dir"));
       fs.writeFileSync(ignoredPath, "one\ntwo\nthree\n");
 
-      const repository = await atom.repositories.resolveForPath(ignoredPath);
+      const repository = await lumine.repositories.resolveForPath(ignoredPath);
       await repository.refreshStatusSnapshot();
       expect(repository.getStatusEntry(ignoredPath).ignored).toBe(true);
       expect(await repository.getFileAtRevision(ignoredPath, "HEAD")).toBeNull();
 
-      const ignoredEditor = await atom.workspace.open(ignoredPath);
+      const ignoredEditor = await lumine.workspace.open(ignoredPath);
       const layer = await createInitializedLayer(ignoredEditor);
       spyOn(repository, "getLineDiffsAsync").andCallThrough();
       ignoredEditor.setCursorBufferPosition([0, Infinity]);
