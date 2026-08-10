@@ -189,7 +189,7 @@ describe("marker-git-diff", () => {
 
       const ignoredEditor = await lumine.workspace.open(ignoredPath);
       const layer = await createInitializedLayer(ignoredEditor);
-      spyOn(repository, "getLineDiffsAsync").andCallThrough();
+      spyOn(repository, "getLineDiffsAsync").and.callThrough();
       ignoredEditor.setCursorBufferPosition([0, Infinity]);
       ignoredEditor.insertText("edited");
       await refresh(layer);
