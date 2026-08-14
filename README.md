@@ -14,7 +14,7 @@ A marker layer that renders added, modified and removed line hunks against the r
 
 ## Installation
 
-To install `marker-git-diff` search for _marker-git-diff_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/marker-git-diff`.
+To install `marker-git-diff` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/marker-git-diff`.
 
 ## Customization
 
@@ -30,7 +30,7 @@ The style can be adjusted in the `styles.css` file, e.g. recolor markers of a gi
 
 ## Services
 
-- **marker.layer** (`1.0.0`): provided to register the `git-diff` marker layer drawn by the editor's overview maps.
+- `marker.layer`: provided to register the `git-diff` marker layer drawn by the editor's overview maps.
 
 ## Contributing
 
