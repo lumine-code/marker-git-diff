@@ -1,5 +1,8 @@
 # marker-git-diff
 
+> [!WARNING]
+> **This package is deprecated.** Its marker layer now ships with [git-diff](https://github.com/lumine-code/git-diff) itself — the marker-* adapter packages were folded into their host packages, and this layer's settings moved to `git-diff.marker.*`. This repository is archived and no longer maintained.
+
 Show git diff markers on the scrollbar and minimap.
 
 A marker layer that renders added, modified and removed line hunks against the repository `HEAD`, drawn by [scrollmap](https://github.com/lumine-code/scrollmap) on the scrollbar and by [minimap](https://github.com/lumine-code/minimap) on the minimap.
